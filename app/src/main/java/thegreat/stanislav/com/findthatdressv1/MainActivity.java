@@ -1,5 +1,9 @@
 package thegreat.stanislav.com.findthatdressv1;
 
+
+//created by Stanley
+
+
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -84,7 +88,8 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
         public void onClick(View view) {
-        captureImage();
+
+            captureImage();
     }
 
 
