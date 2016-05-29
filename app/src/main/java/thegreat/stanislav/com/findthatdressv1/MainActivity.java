@@ -1,7 +1,7 @@
 package thegreat.stanislav.com.findthatdressv1;
 
 
-//created by Stanley
+//Author: StanleyBar, 2016
 
 
 import android.content.Intent;
@@ -18,6 +18,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+import com.backendless.Backendless;
+import com.backendless.BackendlessUser;
+import com.backendless.Files;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.async.callback.BackendlessCallback;
+import com.backendless.exceptions.BackendlessFault;
+import com.backendless.files.BackendlessFile;
 
 import java.io.File;
 import java.io.InputStream;
@@ -27,12 +34,17 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static String img_url;
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
     public static final int MEDIA_TYPE_IMAGE = 1;
+
+    private static final String YOUR_APP_ID = "CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200";
+    private static final String YOUR_SECRET_KEY = "F12946D5-1F47-AD94-FF38-7CB8FABF8E00";
 
     private static final String IMAGE_DIRECTORY_NAME = "FindDress";
     public static Uri fileUri;
     private ImageView imgPreview;
+
 
 
     @Override
@@ -40,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ImageView imgPreview = (ImageView) findViewById(R.id.imageView);
+
+        String appVersion = "v1";
+        Backendless.initApp(this, YOUR_APP_ID, YOUR_SECRET_KEY, appVersion );
 
 
         // Checking camera availability
@@ -50,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
             // will close the app if the device does't have camera
             finish();
         }
+
     }
 
     /**
@@ -90,7 +106,10 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View view) {
 
             captureImage();
-    }
+
+        }
+
+
 
 
 
@@ -133,9 +152,40 @@ public class MainActivity extends AppCompatActivity {
             final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(),
                     options);
 
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+                    Locale.getDefault()).format(new Date());
+
+            final String filename = "IMG" + timeStamp + ".jpg";
+
+            Backendless.Files.Android.upload( bitmap,
+                    Bitmap.CompressFormat.JPEG,
+                    100,
+                    filename,
+                    "mypics", new AsyncCallback<BackendlessFile>()
+
+                    {
+                        @Override
+                        public void handleResponse( final BackendlessFile backendlessFile )
+                        {
+                        }
+
+                        @Override
+                        public void handleFault( BackendlessFault backendlessFault )
+                        {}
+                    });
+
+
             imgPreview.setImageBitmap(bitmap);
 
-        } catch (NullPointerException e) {
+            img_url = "https://api.backendless.com/" + YOUR_APP_ID + "/v1/" + "files/mypics/" + filename;
+
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(img_url));
+            startActivity(browserIntent);
+
+
+        }
+
+            catch (NullPointerException e) {
             e.printStackTrace();
             Toast.makeText(getApplicationContext(),
                     "Error, can not display the image", Toast.LENGTH_SHORT)
@@ -167,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
      * Creating file uri to store image/video
      */
     public Uri getOutputMediaFileUri(int type) {
+
         return Uri.fromFile(getOutputMediaFile(type));
     }
 
