@@ -1,6 +1,8 @@
 package thegreat.stanislav.com.findthatdressv1;
 
 
+
+
 //Author: StanleyBar, 2016
 
 
@@ -26,10 +28,17 @@ import com.backendless.async.callback.BackendlessCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.BackendlessFile;
 
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -93,21 +102,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-//        btnCapturePicture.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View view) {
-//                // capture picture
-//                captureImage();
-//            }
-//        });
-
         public void onClick(View view) {
 
             captureImage();
 
         }
+
+
+        public void onClick2(View view) {
+
+            try {
+                JSONObject json = makeJSON("http://fazz.co/img/demo/gettyimages-490421970.jpg");
+
+                new MyAsyncTask().execute(json);
+
+
+            } catch (Exception exception) {
+                Log.e("test",exception.toString());
+            }
+
+
+
+        }
+
+
+    public static JSONObject makeJSON(String link) {
+
+        JSONObject object = new JSONObject();
+
+        List<String> link_list = new ArrayList<String>();
+        link_list.add(link);
+        JSONArray jsonArray = new JSONArray(link_list);
+
+
+        try {
+            object.put("pageUrl", "stans-java-app");
+            object.put("imageList", jsonArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return object;
+    }
 
 
 
@@ -177,10 +212,13 @@ public class MainActivity extends AppCompatActivity {
 
             imgPreview.setImageBitmap(bitmap);
 
-            img_url = "https://api.backendless.com/" + YOUR_APP_ID + "/v1/" + "files/mypics/" + filename;
+//            img_url = "https://api.backendless.com/" + YOUR_APP_ID + "/v1/" + "files/mypics/" + filename;
+//
+//            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(img_url));
+//            startActivity(browserIntent);
 
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(img_url));
-            startActivity(browserIntent);
+
+
 
 
         }
