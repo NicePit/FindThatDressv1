@@ -6,6 +6,7 @@ package thegreat.stanislav.com.findthatdressv1;
 //Author: StanleyBar, 2016
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -102,28 +103,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-        public void onClick(View view) {
+    public void onClick(View view) {
 
-            captureImage();
+        captureImage();
 
+    }
+
+
+    public void onClick2(View view) {
+
+        try {
+            JSONObject json = makeJSON("http://gorskie.ru/media/k2/items/cache/9c481ef75380c7ddf5ce257dc1b05dab_L.jpg");
+
+            new MyAsyncTask().execute(json);
+//                String result = new MyAsyncTask().execute(json).get();
+//                Toast.makeText(this,result,Toast.LENGTH_SHORT).show();
+
+
+
+        } catch (Exception exception) {
+            Log.e("test", exception.toString());
         }
 
 
-        public void onClick2(View view) {
+    }
 
-            try {
-                JSONObject json = makeJSON("http://fazz.co/img/demo/gettyimages-490421970.jpg");
-
-                new MyAsyncTask().execute(json);
-
-
-            } catch (Exception exception) {
-                Log.e("test",exception.toString());
-            }
+//    public void OnClick3(View view) {
+//        Http_Get.Get_relevance("http://fazz.co/img/demo/gettyimages-490421970.jpg");
+//    }
 
 
 
-        }
+
 
 
     public static JSONObject makeJSON(String link) {
@@ -136,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         try {
-            object.put("pageUrl", "stans-java-app");
+            object.put("pageUrl", "stans-java-app.com");
             object.put("imageList", jsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -212,15 +223,6 @@ public class MainActivity extends AppCompatActivity {
 
             imgPreview.setImageBitmap(bitmap);
 
-//            img_url = "https://api.backendless.com/" + YOUR_APP_ID + "/v1/" + "files/mypics/" + filename;
-//
-//            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(img_url));
-//            startActivity(browserIntent);
-
-
-
-
-
         }
 
             catch (NullPointerException e) {
@@ -242,13 +244,13 @@ public class MainActivity extends AppCompatActivity {
         else {
             // failed to capture image
             Toast.makeText(getApplicationContext(),
-                    "Sorry! Failed to capture image", Toast.LENGTH_SHORT)
+                    "Cancelled", Toast.LENGTH_SHORT)
                     .show();
         }
-        if (resultCode == RESULT_CANCELED) {
-            Toast.makeText(getApplicationContext(),"Cancelled",Toast.LENGTH_SHORT)
-                    .show();
-        }
+//        if (resultCode == RESULT_CANCELED) {
+//            Toast.makeText(getApplicationContext(),"Cancelled",Toast.LENGTH_SHORT)
+//                    .show();
+//        }
     }
 
     /**
