@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 import com.backendless.Backendless;
@@ -42,11 +43,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TaskComplete {
 
     public static String img_url;
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
     public static final int MEDIA_TYPE_IMAGE = 1;
+    public static String filename = "";
 
     private static final String YOUR_APP_ID = "CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200";
     private static final String YOUR_SECRET_KEY = "F12946D5-1F47-AD94-FF38-7CB8FABF8E00";
@@ -112,21 +114,42 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClick2(View view) {
 
+        Log.e("test",filename);
+
+        if (filename.length() > 0) {
+
         try {
-            JSONObject json = makeJSON("http://gorskie.ru/media/k2/items/cache/9c481ef75380c7ddf5ce257dc1b05dab_L.jpg");
 
-            new MyAsyncTask().execute(json);
-//                String result = new MyAsyncTask().execute(json).get();
-//                Toast.makeText(this,result,Toast.LENGTH_SHORT).show();
+            String link_base = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/";
 
+            JSONObject json = makeJSON(link_base+filename);
 
+            new MyAsyncTask(this).execute(json);
 
         } catch (Exception exception) {
             Log.e("test", exception.toString());
         }
-
+        }
+        else {
+            Toast.makeText(this,"Take a picture motherfucker",Toast.LENGTH_SHORT).show();
+        }
 
     }
+
+    public void onClick3 (View view) {
+        Log.e("test", "Click3 - OK");
+//        if (filename.length() > 0) {
+//
+//        }
+    }
+
+
+    @Override
+    public void onTaskComplete(String result) {
+
+        Toast.makeText(this,result,Toast.LENGTH_LONG).show();
+    }
+
 
 //    public void OnClick3(View view) {
 //        Http_Get.Get_relevance("http://fazz.co/img/demo/gettyimages-490421970.jpg");
@@ -201,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
                     Locale.getDefault()).format(new Date());
 
-            final String filename = "IMG" + timeStamp + ".jpg";
+            filename = "IMG" + timeStamp + ".jpg";
 
             Backendless.Files.Android.upload( bitmap,
                     Bitmap.CompressFormat.JPEG,
@@ -294,5 +317,6 @@ public class MainActivity extends AppCompatActivity {
 
         return mediaFile;
     }
+
 
 }

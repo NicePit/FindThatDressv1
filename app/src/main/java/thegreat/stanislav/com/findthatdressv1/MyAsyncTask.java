@@ -5,6 +5,7 @@ package thegreat.stanislav.com.findthatdressv1; /**
 
 
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -18,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,6 +30,30 @@ import java.util.List;
 class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
 
     private Exception exception;
+
+    private Context mContext;
+
+    ProgressDialog mProgress;
+    private TaskComplete mCallback;
+
+    public MyAsyncTask(Context context){
+        this.mContext = context;
+        this.mCallback = (TaskComplete) context;
+
+    }
+
+    @Override
+    public void onPreExecute() {
+        mProgress = new ProgressDialog(mContext);
+        mProgress.setMessage("Please wait...");
+        mProgress.show();
+    }
+
+//    private OnTaskCompleted listener;
+//
+//    public MyAsyncTask(OnTaskCompleted listener){
+//        this.listener=listener;
+//    }
 
 
     protected String doInBackground(JSONObject... objects) {
@@ -74,6 +100,10 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
     protected void onPostExecute(String result) {
         // TODO: check this.exception
         // TODO: do something with the feed
+        super.onPostExecute(result);
+        mProgress.dismiss();
+        //This is where you return data back to caller
+        mCallback.onTaskComplete(result);
 //        Log.i("test", result);
 //        Http_Get.Get_relevance("http://fazz.co/img/demo/gettyimages-490421970.jpg");
 

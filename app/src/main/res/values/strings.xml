@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">FindThatDress</string>
-    <string name="button">Take picture</string>
-    <string name="preview">Preview</string>
+    <string name="button">Take photo!</string>
+    <string name="preview">Photo Preview</string>
     <string name="bla">ImagePreview</string>
-    <string name="send">SEND</string>
-    <string name="get">GET</string>
+    <string name="send">Find that!</string>
 </resources>
