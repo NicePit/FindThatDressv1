@@ -48,13 +48,4 @@
         android:layout_above="@+id/imageView"
         android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/button3"
-        android:layout_above="@+id/textView"
-        android:layout_alignEnd="@+id/button2"
-        android:onClick="onClick3"/>
-
 </RelativeLayout>

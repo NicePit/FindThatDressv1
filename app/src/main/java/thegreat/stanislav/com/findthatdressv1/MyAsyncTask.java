@@ -24,12 +24,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
 
-    private Exception exception;
+//    private Exception exception;
 
     private Context mContext;
 
@@ -49,51 +50,34 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
         mProgress.show();
     }
 
-//    private OnTaskCompleted listener;
-//
-//    public MyAsyncTask(OnTaskCompleted listener){
-//        this.listener=listener;
-//    }
-
 
     protected String doInBackground(JSONObject... objects) {
-        HttpURLConnection connection = null;
-        Log.i("test","start: success");
-        try {
-            URL url = new URL("https://extremeli.trendi.guru/api/images");
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
-            OutputStreamWriter streamWriter = new OutputStreamWriter(connection.getOutputStream());
-            streamWriter.write(objects[0].toString());
-            streamWriter.flush();
-            StringBuilder stringBuilder = new StringBuilder();
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
-                BufferedReader bufferedReader = new BufferedReader(streamReader);
-                String response = null;
-                while ((response = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(response + "\n");
-                }
-                bufferedReader.close();
 
-                Log.i("test", stringBuilder.toString());
-                return stringBuilder.toString();
-            } else {
-                Log.i("test", connection.getResponseMessage());
-                return null;
+
+    int i=0;
+    String answer;
+
+    while (i<5) {
+
+        try {
+
+            answer = Http_Post.send_data(objects[0]);
+            i+=1;
+
+            if (answer.toLowerCase().contains("true}, \"success\": true}".toLowerCase())) {
+                Log.i("test","Answer is TRUE, continue to GET method");
+                return Http_Get.get_relevance();
+
             }
-        } catch (Exception exception) {
-            Log.e("test", exception.toString());
-            return null;
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
+            Thread.sleep(60000);
+
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
         }
+    }
+    Log.i("test","Answer is FALSE");
+    return "";
+
     }
 
 

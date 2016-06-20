@@ -18,20 +18,20 @@ import java.util.List;
  * Created by stanislav on 6/6/16.
  */
 
-public class Http_Get {
+public class Http_Get extends MainActivity {
 
-
+    private static String IMG_URL = img_url;
     private static String result;
     private static final String Str_Server = "https://extremeli.trendi.guru/api/images?imageUrl=";
 
-    public static String Get_relevance(String image_url) {
+    public static String get_relevance() {
 
 
         Log.i("get","started");
         URL url;
         HttpURLConnection urlConnection = null;
         try {
-            url = new URL(Str_Server+image_url);
+            url = new URL(Str_Server+IMG_URL);
 
             urlConnection = (HttpURLConnection) url
                     .openConnection();
@@ -56,11 +56,11 @@ public class Http_Get {
         }
             catch (Exception e) {
             e.printStackTrace();
-                Log.e("get","Error");
+                Log.e("test","Error while getting result (GET METHOD)");
                 return null;
 
         }
-        Log.i("get",result);
+        Log.i("test","Results for relevant image: " + result);
         return result;
     }
 }

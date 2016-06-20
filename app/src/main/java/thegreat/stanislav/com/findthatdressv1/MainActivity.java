@@ -42,6 +42,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements TaskComplete {
 
@@ -106,48 +108,63 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
 
     public void onClick(View view) {
-
         captureImage();
-
     }
 
 
     public void onClick2(View view) {
+        Send_request();
+    }
 
-        Log.e("test",filename);
+
+    public void Send_request() {
 
         if (filename.length() > 0) {
-
-        try {
-
             String link_base = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/";
+          img_url = link_base+filename;
+//          img_url = "http://cdn.posh24.com/images/:complete/p/2018319/l/fun_pics/check_it_out_heres_how_much_celebrities_really_weigh.jpg";
+//          img_url = "http://www.aceshowbiz.com/images/wennpic/angelina-jolie-third-annual-women-in-the-world-04.jpg";
+//          img_url = "http://develop.backendless.com/console/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/appversion/17BD303A-53F9-2E95-FFCF-BAD07389F000/maxddpcccnsnthujiomyfdkbjjjvjgzuayxc/files/view/mypics/IMG20160620_171558.jpg";
+            try {
 
-            JSONObject json = makeJSON(link_base+filename);
+              JSONObject json = makeJSON(img_url);
 
-            new MyAsyncTask(this).execute(json);
 
-        } catch (Exception exception) {
-            Log.e("test", exception.toString());
-        }
+                new MyAsyncTask(this).execute(json);
+
+            } catch (Exception exception) {
+                Log.e("test", exception.toString());
+            }
         }
         else {
-            Toast.makeText(this,"Take a picture motherfucker",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Take a picture first, motherfucker",Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    public void onClick3 (View view) {
-        Log.e("test", "Click3 - OK");
-//        if (filename.length() > 0) {
-//
-//        }
-    }
+
+
+
+
 
 
     @Override
     public void onTaskComplete(String result) {
 
-        Toast.makeText(this,result,Toast.LENGTH_LONG).show();
+//    boolean pic_is_relevant = result.toLowerCase().contains(": false}, \"success\": true".toLowerCase());
+//        if (pic_is_relevant)
+//            Send_request();
+//        else {
+            Toast.makeText(this, result, Toast.LENGTH_LONG).show();
+        try {
+            JSONObject json_result = new JSONObject(result);
+            Log.i("test","json created successfully");
+        }
+        catch (Exception exception) {
+           Log.e("test","json_result exception handled");
+        }
+
+//        }
     }
 
 
