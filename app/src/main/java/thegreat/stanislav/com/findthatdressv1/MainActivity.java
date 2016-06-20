@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -121,10 +122,10 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
         if (filename.length() > 0) {
             String link_base = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/";
-          img_url = link_base+filename;
+//          img_url = link_base+filename;
 //          img_url = "http://cdn.posh24.com/images/:complete/p/2018319/l/fun_pics/check_it_out_heres_how_much_celebrities_really_weigh.jpg";
 //          img_url = "http://www.aceshowbiz.com/images/wennpic/angelina-jolie-third-annual-women-in-the-world-04.jpg";
-//          img_url = "http://develop.backendless.com/console/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/appversion/17BD303A-53F9-2E95-FFCF-BAD07389F000/maxddpcccnsnthujiomyfdkbjjjvjgzuayxc/files/view/mypics/IMG20160620_171558.jpg";
+            img_url = "http://develop.backendless.com/console/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/appversion/17BD303A-53F9-2E95-FFCF-BAD07389F000/maxddpcccnsnthujiomyfdkbjjjvjgzuayxc/files/view/mypics/IMG20160620_171558.jpg";
             try {
 
               JSONObject json = makeJSON(img_url);
@@ -151,30 +152,47 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     @Override
     public void onTaskComplete(String result) {
 
+        JSONObject json_result;
+
 //    boolean pic_is_relevant = result.toLowerCase().contains(": false}, \"success\": true".toLowerCase());
 //        if (pic_is_relevant)
 //            Send_request();
 //        else {
             Toast.makeText(this, result, Toast.LENGTH_LONG).show();
         try {
-            JSONObject json_result = new JSONObject(result);
+            json_result = new JSONObject(result);
             Log.i("test","json created successfully");
+
+            JSONArray items = json_result.getJSONArray("items");
+
+
+            for (int i=0; i<items.length();i++) {
+                JSONObject item = items.getJSONObject(i);
+                JSONArray sim_results = item.getJSONArray("similar_results");
+
+                for (int j=0; j<sim_results.length();j++) {
+                    JSONObject sim_result = sim_results.getJSONObject(j);
+                    Log.i("test",sim_result.toString());
+                    String click_url = sim_result.getString("clickUrl");
+                    Log.i("test",click_url);
+                    JSONObject images = sim_result.getJSONObject("images");
+                    String image = images.getString("Medium");
+                    Log.i("test","IMAGE LINK: " + image);
+
+
+                }
+
+            }
+
         }
         catch (Exception exception) {
            Log.e("test","json_result exception handled");
         }
 
-//        }
+
+
+
     }
-
-
-//    public void OnClick3(View view) {
-//        Http_Get.Get_relevance("http://fazz.co/img/demo/gettyimages-490421970.jpg");
-//    }
-
-
-
-
 
 
     public static JSONObject makeJSON(String link) {
