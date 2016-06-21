@@ -69,7 +69,9 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
                 return Http_Get.get_relevance();
 
             }
-            Thread.sleep(60000);
+            else {
+                Thread.sleep(60000);
+            }
 
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();

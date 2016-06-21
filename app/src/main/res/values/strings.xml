@@ -4,4 +4,5 @@
     <string name="preview">Photo Preview</string>
     <string name="bla">ImagePreview</string>
     <string name="send">Find that!</string>
+    <string name="result">Similar results:</string>
 </resources>

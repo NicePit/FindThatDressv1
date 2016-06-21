@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
     public static String img_url;
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
+    private static final int DISPLAY_RESULTS_REQUEST_CODE = 200;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static String filename = "";
 
@@ -138,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
             }
         }
         else {
-            Toast.makeText(this,"Take a picture first, motherfucker",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Please, take a picture first",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -152,42 +153,13 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     @Override
     public void onTaskComplete(String result) {
 
-        JSONObject json_result;
+        Intent intent = new Intent(this,ResultActivity.class);
 
-//    boolean pic_is_relevant = result.toLowerCase().contains(": false}, \"success\": true".toLowerCase());
-//        if (pic_is_relevant)
-//            Send_request();
-//        else {
-            Toast.makeText(this, result, Toast.LENGTH_LONG).show();
-        try {
-            json_result = new JSONObject(result);
-            Log.i("test","json created successfully");
+        intent.putExtra("string",result);
 
-            JSONArray items = json_result.getJSONArray("items");
+        startActivityForResult(intent, DISPLAY_RESULTS_REQUEST_CODE );
 
 
-            for (int i=0; i<items.length();i++) {
-                JSONObject item = items.getJSONObject(i);
-                JSONArray sim_results = item.getJSONArray("similar_results");
-
-                for (int j=0; j<sim_results.length();j++) {
-                    JSONObject sim_result = sim_results.getJSONObject(j);
-                    Log.i("test",sim_result.toString());
-                    String click_url = sim_result.getString("clickUrl");
-                    Log.i("test",click_url);
-                    JSONObject images = sim_result.getJSONObject("images");
-                    String image = images.getString("Medium");
-                    Log.i("test","IMAGE LINK: " + image);
-
-
-                }
-
-            }
-
-        }
-        catch (Exception exception) {
-           Log.e("test","json_result exception handled");
-        }
 
 
 
