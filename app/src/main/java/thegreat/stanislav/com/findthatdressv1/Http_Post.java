@@ -42,11 +42,11 @@ public class Http_Post {
                 Log.i("test", stringBuilder.toString());
                 return stringBuilder.toString();
             } else {
-                Log.i("test", connection.getResponseMessage());
+                Log.i("test", "! " + connection.getResponseMessage());
                 return null;
             }
         } catch (Exception exception) {
-            Log.e("test", exception.toString());
+            Log.e("test", "Error while getting result (POST METHOD) " + exception.toString());
             return null;
         } finally {
             if (connection != null) {
