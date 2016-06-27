@@ -46,7 +46,7 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
     @Override
     public void onPreExecute() {
         mProgress = new ProgressDialog(mContext);
-        mProgress.setMessage("Please wait...");
+        mProgress.setMessage("JUST REGA!!!");
         mProgress.show();
     }
 

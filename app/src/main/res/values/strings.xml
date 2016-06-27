@@ -6,4 +6,6 @@
     <string name="send">Find that!</string>
     <string name="result">Similar results:</string>
     <string name="buy">Click to buy!</string>
+    <string name="browse">Browse picture</string>
+    <string name="or">OR</string>
 </resources>

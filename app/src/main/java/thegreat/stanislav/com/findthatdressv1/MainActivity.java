@@ -9,6 +9,7 @@ package thegreat.stanislav.com.findthatdressv1;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -49,17 +50,20 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity implements TaskComplete {
 
     public static String img_url;
+    public static Uri fileUri;
+    public static String filename = "";
+
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
     private static final int DISPLAY_RESULTS_REQUEST_CODE = 200;
+    private static final int BROWSE_PIC_REQUEST_CODE = 300;
     public static final int MEDIA_TYPE_IMAGE = 1;
-    public static String filename = "";
 
     private static final String YOUR_APP_ID = "CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200";
     private static final String YOUR_SECRET_KEY = "F12946D5-1F47-AD94-FF38-7CB8FABF8E00";
 
     private static final String IMAGE_DIRECTORY_NAME = "FindDress";
-    public static Uri fileUri;
-    private ImageView imgPreview;
+
+//    private ImageView imgPreview;
 
 
 
@@ -106,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
         // get the file url
         fileUri = savedInstanceState.getParcelable("file_uri");
+        Log.i("test","uri2: "+ fileUri.toString());
     }
 
 
@@ -118,6 +123,16 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
         Send_request();
     }
 
+    public void onClick3(View view) {
+
+        Intent i = new Intent(
+                Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        startActivityForResult(i, BROWSE_PIC_REQUEST_CODE);
+
+    }
+
 
     public void Send_request() {
 
@@ -125,8 +140,8 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
             String link_base = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/";
 //          img_url = link_base+filename;
 //          img_url = "http://cdn.posh24.com/images/:complete/p/2018319/l/fun_pics/check_it_out_heres_how_much_celebrities_really_weigh.jpg";
-//          img_url = "http://www.aceshowbiz.com/images/wennpic/angelina-jolie-third-annual-women-in-the-world-04.jpg";
-            img_url = "http://develop.backendless.com/console/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/appversion/17BD303A-53F9-2E95-FFCF-BAD07389F000/maxddpcccnsnthujiomyfdkbjjjvjgzuayxc/files/view/mypics/IMG20160620_171558.jpg";
+          img_url = "http://www.aceshowbiz.com/images/wennpic/angelina-jolie-third-annual-women-in-the-world-04.jpg";
+//            img_url = "http://develop.backendless.com/console/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/appversion/17BD303A-53F9-2E95-FFCF-BAD07389F000/maxddpcccnsnthujiomyfdkbjjjvjgzuayxc/files/view/mypics/IMG20160620_171558.jpg";
             try {
 
               JSONObject json = makeJSON(img_url);
@@ -225,6 +240,8 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
             options.inSampleSize = 8;
             ImageView imgPreview = (ImageView) findViewById(R.id.imageView);
 
+
+
             final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(),
                     options);
 
@@ -242,8 +259,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
                     {
                         @Override
                         public void handleResponse( final BackendlessFile backendlessFile )
-                        {
-                        }
+                        {}
 
                         @Override
                         public void handleFault( BackendlessFault backendlessFault )
@@ -264,13 +280,41 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
             previewCapturedImage();
 
         }
+        else if (requestCode == DISPLAY_RESULTS_REQUEST_CODE) {
+            Toast.makeText(this,"Try again?",Toast.LENGTH_SHORT).show();
+        }
+        else if (requestCode == BROWSE_PIC_REQUEST_CODE && resultCode == RESULT_OK) {
+
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            Cursor cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+
+            options.inSampleSize = 4;
+            ImageView imgPreview = (ImageView) findViewById(R.id.imageView);
+
+            imgPreview.setImageBitmap(BitmapFactory.decodeFile(picturePath,options));
+
+        }
+
+
+
+
         else {
             // failed to capture image
             Toast.makeText(getApplicationContext(),

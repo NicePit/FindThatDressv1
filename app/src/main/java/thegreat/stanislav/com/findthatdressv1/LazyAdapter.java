@@ -5,6 +5,12 @@ package thegreat.stanislav.com.findthatdressv1;
  */
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +21,16 @@ import android.widget.TextView;
 
 public class LazyAdapter extends BaseAdapter {
 
+    private String [] prices = {};
     private Activity activity;
     private String[] data;
     private static LayoutInflater inflater=null;
     public ImageLoader imageLoader;
 
-    public LazyAdapter(Activity a, String[] d, String[] buy_links) {
+    public LazyAdapter(Activity a, String[] d, String [] arr_prices) {
+
+        prices = arr_prices;
+        Log.i("test","Lazy price is:" + prices[0]);
         activity = a;
         data=d;
         inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -48,8 +58,15 @@ public class LazyAdapter extends BaseAdapter {
 
         TextView text=(TextView)vi.findViewById(R.id.text);;
         ImageView image=(ImageView)vi.findViewById(R.id.image);
-        text.setText("Click to buy");
+
         imageLoader.DisplayImage(data[position], image);
+
+        Spannable price = new SpannableString(prices[position]);
+        price.setSpan(new ForegroundColorSpan(Color.RED), 0, price.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        text.setText("Click to buy for ");
+        text.append(price);
+        text.append(" $");
         return vi;
     }
 }
