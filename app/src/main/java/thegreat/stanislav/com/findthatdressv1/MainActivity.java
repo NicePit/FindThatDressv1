@@ -12,6 +12,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -49,6 +51,8 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements TaskComplete {
 
+    private ImageView imgPreview;
+
     public static String img_url;
     public static Uri fileUri;
     public static String filename = "";
@@ -63,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
     private static final String IMAGE_DIRECTORY_NAME = "FindDress";
 
-//    private ImageView imgPreview;
+
 
 
 
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ImageView imgPreview = (ImageView) findViewById(R.id.imageView);
+        imgPreview = (ImageView) findViewById(R.id.imageView);
 
         String appVersion = "v1";
         Backendless.initApp(this, YOUR_APP_ID, YOUR_SECRET_KEY, appVersion );
@@ -110,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
         // get the file url
         fileUri = savedInstanceState.getParcelable("file_uri");
-        Log.i("test","uri2: "+ fileUri.toString());
+
     }
 
 
@@ -120,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
 
     public void onClick2(View view) {
-        Send_request();
+        Send_http_request();
     }
 
     public void onClick3(View view) {
@@ -134,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     }
 
 
-    public void Send_request() {
+    public void Send_http_request() {
 
         if (filename.length() > 0) {
             String link_base = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/";
@@ -154,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
             }
         }
         else {
-            Toast.makeText(this,"Please, take a picture first",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Please, take or browse a picture",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -225,25 +229,9 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
         startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
     }
 
-    private void previewCapturedImage() {
+
+    private void Upload_image (Bitmap bitmap) {
         try {
-
-            //imgPreview.setVisibility(View.VISIBLE);
-
-
-            // bitmap factory
-            BitmapFactory.Options options = new BitmapFactory.Options();
-
-
-            // downsizing image as it throws OutOfMemory Exception for larger
-            // images
-            options.inSampleSize = 8;
-            ImageView imgPreview = (ImageView) findViewById(R.id.imageView);
-
-
-
-            final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(),
-                    options);
 
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
                     Locale.getDefault()).format(new Date());
@@ -266,66 +254,62 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
                         {}
                     });
 
-
-            imgPreview.setImageBitmap(bitmap);
-
         }
 
-            catch (NullPointerException e) {
+        catch (NullPointerException e) {
             e.printStackTrace();
             Toast.makeText(getApplicationContext(),
-                    "Error, can not display the image", Toast.LENGTH_SHORT)
+                    "Error, can not upload image on server", Toast.LENGTH_SHORT)
                     .show();
         }
+
+
+    }
+
+    private void previewCapturedImage() {
+
+
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        options.inSampleSize = 8;
+
+        final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(),
+                options);
+
+        Upload_image(bitmap);
+
+        imgPreview.setImageBitmap(rotate_picture(bitmap));
+
+        }
+
+    private static int exifToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
+        return 0;
+    }
+
+    private static Bitmap rotate_picture (Bitmap bitmap) {
+
+        Bitmap adjustedBitmap = bitmap;
+
+        try {
+
+            ExifInterface exif = new ExifInterface(fileUri.getPath());
+            int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            int rotationInDegrees = exifToDegrees(rotation);
+            Matrix matrix = new Matrix();
+            if (rotation != 0f) {matrix.preRotate(rotationInDegrees);}
+            adjustedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+
+        }
+        catch (Exception ex) {}
+        return adjustedBitmap;
     }
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
-            previewCapturedImage();
-
-        }
-        else if (requestCode == DISPLAY_RESULTS_REQUEST_CODE) {
-            Toast.makeText(this,"Try again?",Toast.LENGTH_SHORT).show();
-        }
-        else if (requestCode == BROWSE_PIC_REQUEST_CODE && resultCode == RESULT_OK) {
-
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-
-            BitmapFactory.Options options = new BitmapFactory.Options();
-
-            options.inSampleSize = 4;
-            ImageView imgPreview = (ImageView) findViewById(R.id.imageView);
-
-            imgPreview.setImageBitmap(BitmapFactory.decodeFile(picturePath,options));
-
-        }
-
-
-
-
-        else {
-            // failed to capture image
-            Toast.makeText(getApplicationContext(),
-                    "Cancelled", Toast.LENGTH_SHORT)
-                    .show();
-        }
-//        if (resultCode == RESULT_CANCELED) {
-//            Toast.makeText(getApplicationContext(),"Cancelled",Toast.LENGTH_SHORT)
-//                    .show();
-//        }
-    }
 
     /**
      * Creating file uri to store image/video
@@ -368,6 +352,71 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
         return mediaFile;
     }
+
+
+
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
+            previewCapturedImage();
+
+        }
+        else if (requestCode == DISPLAY_RESULTS_REQUEST_CODE) {
+            Toast.makeText(this,"Try again?",Toast.LENGTH_SHORT).show();
+        }
+
+        // if image is browsed from phone => preview is set up within onActivityResult
+
+
+        else if (requestCode == BROWSE_PIC_REQUEST_CODE && resultCode == RESULT_OK) {
+
+            Uri selectedImage = data.getData();
+
+
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            Cursor cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            fileUri = Uri.parse(picturePath);
+
+            cursor.close();
+
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+
+            options.inSampleSize = 4;
+
+            Bitmap bitmap = BitmapFactory.decodeFile(picturePath,options);
+
+            Upload_image(bitmap);
+
+            imgPreview.setImageBitmap(rotate_picture(bitmap));
+
+        }
+
+
+
+
+        else {
+            // failed to capture image
+            Toast.makeText(getApplicationContext(),
+                    "Cancelled", Toast.LENGTH_SHORT)
+                    .show();
+        }
+//        if (resultCode == RESULT_CANCELED) {
+//            Toast.makeText(getApplicationContext(),"Cancelled",Toast.LENGTH_SHORT)
+//                    .show();
+//        }
+    }
+
 
 
 }
