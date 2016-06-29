@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">FindThatDress</string>
-    <string name="button">Take photo!</string>
+    <string name="button">Take photo</string>
     <string name="preview">Photo Preview</string>
     <string name="bla">ImagePreview</string>
     <string name="send">Find that!</string>
     <string name="result">Similar results:</string>
     <string name="buy">Click to buy!</string>
-    <string name="browse">Browse picture</string>
+    <string name="browse">Browse</string>
     <string name="or">OR</string>
 </resources>
