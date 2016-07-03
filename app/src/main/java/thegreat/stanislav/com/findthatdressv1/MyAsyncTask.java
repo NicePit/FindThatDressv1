@@ -46,7 +46,7 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
     @Override
     public void onPreExecute() {
         mProgress = new ProgressDialog(mContext);
-        mProgress.setMessage("JUST REGA!!!");
+        mProgress.setMessage("Sending request. Please wait...");
         mProgress.show();
     }
 
@@ -56,8 +56,9 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
 
     int i=0;
     String answer;
+    String answer2 = "";
 
-    while (i<5) {
+    while (i<10) {
 
         try {
 
@@ -65,20 +66,20 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
             i+=1;
 
             if (answer.toLowerCase().contains("true}, \"success\": true}".toLowerCase())) {
-                Log.i("test","Answer is TRUE, continue to GET method");
-                return Http_Get.get_relevance();
-
+//                Log.i("test","Answer is TRUE, continue to GET method");
+                answer2 = Http_Get.get_relevance();
+                break;
             }
             else {
-                Thread.sleep(60000);
+                Thread.sleep(15000);
             }
 
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
     }
-    Log.i("test","Answer is FALSE");
-    return "";
+
+    return answer2;
 
     }
 

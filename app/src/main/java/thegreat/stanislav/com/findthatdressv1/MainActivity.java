@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     public static String img_url;
     public static Uri fileUri;
     public static String filename = "";
+    private static final String upload_server = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/";
 
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
     private static final int DISPLAY_RESULTS_REQUEST_CODE = 200;
@@ -77,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
         setContentView(R.layout.activity_main);
         imgPreview = (ImageView) findViewById(R.id.imageView);
 
+
+
+
         String appVersion = "v1";
         Backendless.initApp(this, YOUR_APP_ID, YOUR_SECRET_KEY, appVersion );
 
@@ -89,6 +93,24 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
             // will close the app if the device does't have camera
             finish();
         }
+
+
+        Intent receivedIntent = getIntent();
+        String receivedAction = receivedIntent.getAction();
+        if (receivedAction.equals(Intent.ACTION_SEND)){
+            Uri receivedUri = receivedIntent.getParcelableExtra(Intent.EXTRA_STREAM);
+
+//            imgPreview.setImageURI(receivedUri);
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), receivedUri);
+                imgPreview.setImageBitmap(bitmap);
+                Upload_image(bitmap);
+            }
+            catch (Exception e) {
+                Log.i("test",e.toString());
+            }
+        }
+
 
     }
 
@@ -141,8 +163,8 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     public void Send_http_request() {
 
         if (filename.length() > 0) {
-            String link_base = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/";
-//          img_url = link_base+filename;
+
+//          img_url = upload_server+filename;
 //          img_url = "http://cdn.posh24.com/images/:complete/p/2018319/l/fun_pics/check_it_out_heres_how_much_celebrities_really_weigh.jpg";
           img_url = "http://www.aceshowbiz.com/images/wennpic/angelina-jolie-third-annual-women-in-the-world-04.jpg";
 //            img_url = "http://develop.backendless.com/console/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/appversion/17BD303A-53F9-2E95-FFCF-BAD07389F000/maxddpcccnsnthujiomyfdkbjjjvjgzuayxc/files/view/mypics/IMG20160620_171558.jpg";
@@ -174,9 +196,14 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
         Intent intent = new Intent(this,ResultActivity.class);
 
-        intent.putExtra("string",result);
 
+
+        intent.putExtra("string",result);
+        try {
         startActivityForResult(intent, DISPLAY_RESULTS_REQUEST_CODE );
+
+            }
+        catch (Exception e) {Log.e("test", e.toString());}
 
 
 
