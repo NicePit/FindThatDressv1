@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     public static String img_url;
     public static Uri fileUri;
     public static String filename = "";
-    private static final String upload_server = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/";
 
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
     private static final int DISPLAY_RESULTS_REQUEST_CODE = 200;
@@ -78,11 +77,8 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
         setContentView(R.layout.activity_main);
         imgPreview = (ImageView) findViewById(R.id.imageView);
 
-
-
-
         String appVersion = "v1";
-        Backendless.initApp(this, YOUR_APP_ID, YOUR_SECRET_KEY, appVersion );
+        Backendless.initApp(this, YOUR_APP_ID, YOUR_SECRET_KEY, appVersion);
 
 
         // Checking camera availability
@@ -96,23 +92,21 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
 
         Intent receivedIntent = getIntent();
-        String receivedAction = receivedIntent.getAction();
-        if (receivedAction.equals(Intent.ACTION_SEND)){
-            Uri receivedUri = receivedIntent.getParcelableExtra(Intent.EXTRA_STREAM);
 
-//            imgPreview.setImageURI(receivedUri);
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), receivedUri);
-                imgPreview.setImageBitmap(bitmap);
-                Upload_image(bitmap);
-            }
-            catch (Exception e) {
-                Log.i("test",e.toString());
-            }
+
+        Uri receivedUri = receivedIntent.getParcelableExtra(Intent.EXTRA_STREAM);
+
+
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), receivedUri);
+            imgPreview.setImageBitmap(bitmap);
+            Upload_image(bitmap);
+        } catch (Exception e) {
+            Log.i("test", e.toString());
         }
 
 
-    }
+        }
 
     /**
      * Here we store the file url as it will be null after returning from camera
@@ -163,14 +157,14 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     public void Send_http_request() {
 
         if (filename.length() > 0) {
-
-//          img_url = upload_server+filename;
-//          img_url = "http://cdn.posh24.com/images/:complete/p/2018319/l/fun_pics/check_it_out_heres_how_much_celebrities_really_weigh.jpg";
-          img_url = "http://www.aceshowbiz.com/images/wennpic/angelina-jolie-third-annual-women-in-the-world-04.jpg";
+            String link_base = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/";
+             img_url = link_base+filename;
+//         img_url = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/IMG20160703_170307.jpg";
+//            img_url = "http://3.bp.blogspot.com/-hsbcC1xjWNk/UNT4GMJCNsI/AAAAAAAADNk/G37fMORSDsI/s1600/Ian-McKellen001.jpg";
 //            img_url = "http://develop.backendless.com/console/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/appversion/17BD303A-53F9-2E95-FFCF-BAD07389F000/maxddpcccnsnthujiomyfdkbjjjvjgzuayxc/files/view/mypics/IMG20160620_171558.jpg";
             try {
 
-              JSONObject json = makeJSON(img_url);
+                JSONObject json = makeJSON(img_url);
 
 
                 new MyAsyncTask(this).execute(json);
@@ -194,18 +188,20 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     @Override
     public void onTaskComplete(String result) {
 
-        Intent intent = new Intent(this,ResultActivity.class);
+        if (result.equals("")) {
 
+            Toast.makeText(this,"Image is not relevant",Toast.LENGTH_SHORT).show();
+        }
 
+        else {
 
-        intent.putExtra("string",result);
-        try {
-        startActivityForResult(intent, DISPLAY_RESULTS_REQUEST_CODE );
+            Intent intent = new Intent(this, ResultActivity.class);
 
-            }
-        catch (Exception e) {Log.e("test", e.toString());}
+            intent.putExtra("string", result);
 
+            startActivityForResult(intent, DISPLAY_RESULTS_REQUEST_CODE);
 
+        }
 
 
 
@@ -265,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
             filename = "IMG" + timeStamp + ".jpg";
 
-            Backendless.Files.Android.upload( bitmap,
+            Backendless.Files.Android.upload( rotate_picture(bitmap),
                     Bitmap.CompressFormat.JPEG,
                     100,
                     filename,
@@ -308,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
         imgPreview.setImageBitmap(rotate_picture(bitmap));
 
-        }
+    }
 
     private static int exifToDegrees(int exifOrientation) {
         if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }

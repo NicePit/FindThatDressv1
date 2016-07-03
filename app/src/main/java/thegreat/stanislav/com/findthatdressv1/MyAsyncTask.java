@@ -11,6 +11,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +49,8 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
         mProgress = new ProgressDialog(mContext);
         mProgress.setMessage("Sending request. Please wait...");
         mProgress.show();
+        mProgress.setCancelable(false);
+        mProgress.setCanceledOnTouchOutside(false);
     }
 
 
@@ -58,7 +61,7 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
     String answer;
     String answer2 = "";
 
-    while (i<10) {
+    while (i<15) {
 
         try {
 
@@ -71,13 +74,19 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
                 break;
             }
             else {
-                Thread.sleep(15000);
+
+                if (i==15) {
+                    answer2 = "";
+                }
+                Thread.sleep(20000);
             }
 
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
     }
+
+
 
     return answer2;
 
