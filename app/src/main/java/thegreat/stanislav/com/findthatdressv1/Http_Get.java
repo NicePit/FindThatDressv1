@@ -26,8 +26,6 @@ public class Http_Get extends MainActivity {
 
     public static String get_relevance() {
 
-
-        Log.i("get","started");
         URL url;
         HttpURLConnection urlConnection = null;
         try {
@@ -56,11 +54,11 @@ public class Http_Get extends MainActivity {
         }
             catch (Exception e) {
             e.printStackTrace();
-                Log.e("test","Error while getting result (GET METHOD)");
+
                 return null;
 
         }
-        Log.i("test","Results for relevant image: " + result);
+
         return result;
     }
 }

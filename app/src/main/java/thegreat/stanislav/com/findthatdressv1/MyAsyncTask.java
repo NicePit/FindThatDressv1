@@ -47,7 +47,7 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
     @Override
     public void onPreExecute() {
         mProgress = new ProgressDialog(mContext);
-        mProgress.setMessage("Sending request. Please wait...");
+        mProgress.setMessage("Please wait...It can take up to 3 minutes. Good luck:)");
         mProgress.show();
         mProgress.setCancelable(false);
         mProgress.setCanceledOnTouchOutside(false);
@@ -58,25 +58,26 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
 
 
     int i=0;
-    String answer;
-    String answer2 = "";
+    String answer_POST;
+    String answer_GET = "";
 
-    while (i<15) {
+    while (i<9) {
 
         try {
 
-            answer = Http_Post.send_data(objects[0]);
+            answer_POST = Http_Post.send_data(objects[0]);
             i+=1;
 
-            if (answer.toLowerCase().contains("true}, \"success\": true}".toLowerCase())) {
-//                Log.i("test","Answer is TRUE, continue to GET method");
-                answer2 = Http_Get.get_relevance();
+            if (answer_POST.toLowerCase().contains("true}, \"success\": true}".toLowerCase())) {
+
+                answer_GET = Http_Get.get_relevance();
                 break;
             }
             else {
 
-                if (i==15) {
-                    answer2 = "";
+                if (i==9) {
+                    answer_GET = "";
+                    break;
                 }
                 Thread.sleep(20000);
             }
@@ -86,31 +87,16 @@ class MyAsyncTask extends AsyncTask<JSONObject, Void, String> {
         }
     }
 
-
-
-    return answer2;
-
+    return answer_GET;
     }
 
 
     protected void onPostExecute(String result) {
-        // TODO: check this.exception
-        // TODO: do something with the feed
+
         super.onPostExecute(result);
         mProgress.dismiss();
         //This is where you return data back to caller
         mCallback.onTaskComplete(result);
-//        Log.i("test", result);
-//        Http_Get.Get_relevance("http://fazz.co/img/demo/gettyimages-490421970.jpg");
-
-//        String TRUE = "true";
-//        String FALSE = "false";
-//        if ((result.toLowerCase().contains(TRUE.toLowerCase())) && (result.toLowerCase().contains(FALSE.toLowerCase()))) {
-//            Log.i("test", "Image is not in database");
-//        } else {
-//            Log.i("test", "Image is in database");
-//        }
-
 
     }
 

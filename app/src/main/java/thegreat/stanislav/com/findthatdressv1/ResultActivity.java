@@ -26,7 +26,7 @@ import java.util.Map;
 public class ResultActivity extends MainActivity {
 
     ListView list;
-    LazyAdapter adapter;
+    ImageListAdapter adapter;
 
 
     @Override
@@ -50,19 +50,19 @@ public class ResultActivity extends MainActivity {
 
 
         list=(ListView)findViewById(R.id.listView);
-        adapter=new LazyAdapter(this,Arr_url_img,Arr_price);
+        adapter=new ImageListAdapter(this,Arr_url_img,Arr_price);
         list.setAdapter(adapter);
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                                    long id) {
-                String url = Arr_url[position];
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
-            }
-        });
+//        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position,
+//                                    long id) {
+//                String url = Arr_url[position];
+//                Intent i = new Intent(Intent.ACTION_VIEW);
+//                i.setData(Uri.parse(url));
+//                startActivity(i);
+//            }
+//        });
 
 
 
@@ -106,7 +106,7 @@ public class ResultActivity extends MainActivity {
 
         }
         catch (Exception exception) {
-            Log.e("test","json_result exception handled");
+
         }
 
         return links_list;
@@ -122,7 +122,7 @@ public class ResultActivity extends MainActivity {
 
         try {
             json_result = new JSONObject(jsonstring);
-            Log.i("test","json created successfully");
+
 
             JSONArray items = json_result.getJSONArray("items");
 
@@ -164,7 +164,7 @@ public class ResultActivity extends MainActivity {
 
         try {
             json_result = new JSONObject(jsonstring);
-            Log.i("test","json created successfully");
+
 
             JSONArray items = json_result.getJSONArray("items");
 

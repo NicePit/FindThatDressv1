@@ -1,11 +1,11 @@
 package thegreat.stanislav.com.findthatdressv1;
 
 
+//Author: Stanley Barabanov, 2016
 
 
-//Author: StanleyBar, 2016
-
-
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,8 +18,10 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -33,6 +35,7 @@ import com.backendless.async.callback.AsyncCallback;
 import com.backendless.async.callback.BackendlessCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.BackendlessFile;
+
 
 
 import org.json.JSONArray;
@@ -91,18 +94,15 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
         }
 
 
+
         Intent receivedIntent = getIntent();
-
-
         Uri receivedUri = receivedIntent.getParcelableExtra(Intent.EXTRA_STREAM);
-
 
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), receivedUri);
             imgPreview.setImageBitmap(bitmap);
-            Upload_image(bitmap);
+            Upload_image(rotate_picture(bitmap));
         } catch (Exception e) {
-            Log.i("test", e.toString());
         }
 
 
@@ -157,11 +157,9 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     public void Send_http_request() {
 
         if (filename.length() > 0) {
-            String link_base = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/";
-             img_url = link_base+filename;
-//         img_url = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/IMG20160703_170307.jpg";
-//            img_url = "http://3.bp.blogspot.com/-hsbcC1xjWNk/UNT4GMJCNsI/AAAAAAAADNk/G37fMORSDsI/s1600/Ian-McKellen001.jpg";
-//            img_url = "http://develop.backendless.com/console/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/appversion/17BD303A-53F9-2E95-FFCF-BAD07389F000/maxddpcccnsnthujiomyfdkbjjjvjgzuayxc/files/view/mypics/IMG20160620_171558.jpg";
+
+            String link_base = "http://develop.backendless.com/console/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/appversion/17BD303A-53F9-2E95-FFCF-BAD07389F000/haeghtsyxaksktrhegljyizcvywhycsgapvs/files/view/mypics/";
+            img_url = link_base+filename;
             try {
 
                 JSONObject json = makeJSON(img_url);
@@ -181,16 +179,29 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
 
 
-
-
-
-
     @Override
     public void onTaskComplete(String result) {
 
         if (result.equals("")) {
 
-            Toast.makeText(this,"Image is not relevant",Toast.LENGTH_SHORT).show();
+
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+            mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+            mBuilder.setContentTitle("Find that dress");
+            mBuilder.setContentText("Wooops! Image is not relevant or overtime. Try again.");
+            Intent resultIntent = new Intent(this, MainActivity.class);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+            stackBuilder.addParentStack(MainActivity.class);
+
+    // Adds the Intent that starts the Activity to the top of the stack
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.setContentIntent(resultPendingIntent);
+
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+    // notificationID allows you to update the notification later on.
+            mNotificationManager.notify(1, mBuilder.build());
         }
 
         else {
@@ -202,9 +213,6 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
             startActivityForResult(intent, DISPLAY_RESULTS_REQUEST_CODE);
 
         }
-
-
-
 
     }
 
@@ -226,9 +234,6 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
         }
         return object;
     }
-
-
-
 
 
     private boolean isDeviceSupportCamera() {
@@ -377,10 +382,6 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     }
 
 
-
-
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -415,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
             BitmapFactory.Options options = new BitmapFactory.Options();
 
-            options.inSampleSize = 4;
+            options.inSampleSize = 3;
 
             Bitmap bitmap = BitmapFactory.decodeFile(picturePath,options);
 
@@ -426,12 +427,10 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
         }
 
 
-
-
         else {
             // failed to capture image
             Toast.makeText(getApplicationContext(),
-                    "Cancelled", Toast.LENGTH_SHORT)
+                    "Action is cancelled", Toast.LENGTH_SHORT)
                     .show();
         }
 //        if (resultCode == RESULT_CANCELED) {
