@@ -1,4 +1,4 @@
-package thegreat.stanislav.com.findthatdressv1;
+package trendi.guru.com.findthatdress;
 
 
 //Author: Stanley Barabanov, 2016
@@ -17,22 +17,16 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 import com.backendless.Backendless;
-import com.backendless.BackendlessUser;
-import com.backendless.Files;
 import com.backendless.async.callback.AsyncCallback;
-import com.backendless.async.callback.BackendlessCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.BackendlessFile;
 
@@ -43,14 +37,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements TaskComplete {
 
@@ -69,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     private static final String YOUR_SECRET_KEY = "F12946D5-1F47-AD94-FF38-7CB8FABF8E00";
 
     private static final String IMAGE_DIRECTORY_NAME = "FindDress";
+
+    private static final String link_base = "https://api.backendless.com/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/v1/files/mypics/";
 
 
 
@@ -107,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
 
         }
+
 
     /**
      * Here we store the file url as it will be null after returning from camera
@@ -158,17 +152,14 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
 
         if (filename.length() > 0) {
 
-            String link_base = "http://develop.backendless.com/console/CF8CC0AC-FDC5-22EA-FFA8-29836A3B2200/appversion/17BD303A-53F9-2E95-FFCF-BAD07389F000/haeghtsyxaksktrhegljyizcvywhycsgapvs/files/view/mypics/";
             img_url = link_base+filename;
             try {
 
                 JSONObject json = makeJSON(img_url);
 
-
                 new MyAsyncTask(this).execute(json);
 
             } catch (Exception exception) {
-                Log.e("test", exception.toString());
             }
         }
         else {
@@ -183,12 +174,12 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     public void onTaskComplete(String result) {
 
         if (result.equals("")) {
-
-
+            filename = "";
+            imgPreview.setImageResource(R.drawable.f_icon);
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-            mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+            mBuilder.setSmallIcon(R.drawable.f_notification);
             mBuilder.setContentTitle("Find that dress");
-            mBuilder.setContentText("Wooops! Image is not relevant or overtime. Try again.");
+            mBuilder.setContentText("Wooops! Overtime error  =( Try later or choose another pic");
             Intent resultIntent = new Intent(this, MainActivity.class);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
             stackBuilder.addParentStack(MainActivity.class);
@@ -261,12 +252,13 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
     private void Upload_image (Bitmap bitmap) {
         try {
 
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+
+           String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
                     Locale.getDefault()).format(new Date());
 
             filename = "IMG" + timeStamp + ".jpg";
 
-            Backendless.Files.Android.upload( rotate_picture(bitmap),
+            Backendless.Files.Android.upload(rotate_picture(bitmap),
                     Bitmap.CompressFormat.JPEG,
                     100,
                     filename,
@@ -305,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
         final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(),
                 options);
 
-        Upload_image(bitmap);
+        Upload_image(rotate_picture(bitmap));
 
         imgPreview.setImageBitmap(rotate_picture(bitmap));
 
@@ -344,7 +336,8 @@ public class MainActivity extends AppCompatActivity implements TaskComplete {
      */
     public Uri getOutputMediaFileUri(int type) {
 
-        return Uri.fromFile(getOutputMediaFile(type));
+        Uri test_uri = Uri.fromFile(getOutputMediaFile(type));
+        return test_uri;
     }
 
     /*

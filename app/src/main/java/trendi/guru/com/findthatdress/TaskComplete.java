@@ -1,4 +1,4 @@
-package thegreat.stanislav.com.findthatdressv1;
+package trendi.guru.com.findthatdress;
 
 /**
  * Created by stanislav on 6/15/16.

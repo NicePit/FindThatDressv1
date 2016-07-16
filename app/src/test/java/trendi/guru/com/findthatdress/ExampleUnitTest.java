@@ -1,4 +1,4 @@
-package thegreat.stanislav.com.findthatdressv1;
+package trendi.guru.com.findthatdress;
 
 import org.junit.Test;
 

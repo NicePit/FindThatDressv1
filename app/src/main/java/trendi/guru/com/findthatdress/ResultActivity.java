@@ -1,24 +1,18 @@
-package thegreat.stanislav.com.findthatdressv1;
+package trendi.guru.com.findthatdress;
 
-import android.content.Context;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * Created by stanislav on 6/21/16.
@@ -53,16 +47,16 @@ public class ResultActivity extends MainActivity {
         adapter=new ImageListAdapter(this,Arr_url_img,Arr_price);
         list.setAdapter(adapter);
 
-//        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position,
-//                                    long id) {
-//                String url = Arr_url[position];
-//                Intent i = new Intent(Intent.ACTION_VIEW);
-//                i.setData(Uri.parse(url));
-//                startActivity(i);
-//            }
-//        });
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                                    long id) {
+                String url = Arr_url[position];
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
 
 
 
@@ -82,7 +76,6 @@ public class ResultActivity extends MainActivity {
 
         try {
             json_result = new JSONObject(jsonstring);
-            Log.i("test","json created successfully");
 
             JSONArray items = json_result.getJSONArray("items");
 
@@ -148,7 +141,7 @@ public class ResultActivity extends MainActivity {
 
         }
         catch (Exception exception) {
-            Log.e("test","json_result exception handled");
+
         }
 
         return images_list;
@@ -191,7 +184,6 @@ public class ResultActivity extends MainActivity {
 
         }
         catch (Exception exception) {
-            Log.e("test","json_result exception handled");
         }
 
         return price_list;

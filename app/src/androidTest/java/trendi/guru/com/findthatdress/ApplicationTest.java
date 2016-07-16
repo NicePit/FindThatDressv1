@@ -1,4 +1,4 @@
-package thegreat.stanislav.com.findthatdressv1;
+package trendi.guru.com.findthatdress;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

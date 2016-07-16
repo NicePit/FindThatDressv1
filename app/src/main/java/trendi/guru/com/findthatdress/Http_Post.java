@@ -1,4 +1,4 @@
-package thegreat.stanislav.com.findthatdressv1;
+package trendi.guru.com.findthatdress;
 
 import android.util.Log;
 
@@ -17,7 +17,6 @@ public class Http_Post {
 
     public static String send_data(JSONObject json) {
         HttpURLConnection connection = null;
-        Log.i("test","start: success");
         try {
             URL url = new URL("https://extremeli.trendi.guru/api/images");
             connection = (HttpURLConnection) url.openConnection();
@@ -39,14 +38,11 @@ public class Http_Post {
                 }
                 bufferedReader.close();
 
-                Log.i("test", stringBuilder.toString());
                 return stringBuilder.toString();
             } else {
-                Log.i("test", "! " + connection.getResponseMessage());
                 return null;
             }
         } catch (Exception exception) {
-            Log.e("test", "Error while getting result (POST METHOD) " + exception.toString());
             return null;
         } finally {
             if (connection != null) {

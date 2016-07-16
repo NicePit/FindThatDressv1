@@ -1,18 +1,12 @@
-package thegreat.stanislav.com.findthatdressv1;
+package trendi.guru.com.findthatdress;
 
-import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+
 
 /**
  * Created by stanislav on 6/6/16.
@@ -20,15 +14,16 @@ import java.util.List;
 
 public class Http_Get extends MainActivity {
 
-    private static String IMG_URL = img_url;
     private static String result;
     private static final String Str_Server = "https://extremeli.trendi.guru/api/images?imageUrl=";
 
     public static String get_relevance() {
 
+        String IMG_URL = img_url;
         URL url;
         HttpURLConnection urlConnection = null;
         try {
+
             url = new URL(Str_Server+IMG_URL);
 
             urlConnection = (HttpURLConnection) url
@@ -52,12 +47,19 @@ public class Http_Get extends MainActivity {
 
         }
         }
+
             catch (Exception e) {
             e.printStackTrace();
 
                 return null;
 
         }
+
+            finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
 
         return result;
     }
