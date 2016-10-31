@@ -1,3 +1,3 @@
 # FindThatDressv1
 
-Android app that takes a photo with clothes and finds similar things in database (built for TrendiGuru)
+Android app that takes a photo with clothes and let you buy similar things from retailers database (built for TrendiGuru)
